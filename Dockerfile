@@ -3,7 +3,10 @@ FROM python:3.9-slim
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    PORT=8000 \
+    HOST=0.0.0.0 \
+    LOG_LEVEL=debug
 
 # Set working directory
 WORKDIR /app
@@ -31,5 +34,17 @@ ENV TMPDIR=/tmp/video_processing
 # Expose port
 EXPOSE 8000
 
+# Create startup script
+RUN echo '#!/bin/bash\n\
+uvicorn main:app \
+--host ${HOST} \
+--port ${PORT} \
+--workers 1 \
+--timeout-keep-alive 300 \
+--log-level ${LOG_LEVEL} \
+--proxy-headers \
+--forwarded-allow-ips "*"' > /app/start.sh && \
+chmod +x /app/start.sh
+
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1", "--timeout-keep-alive", "300"] 
+CMD ["/app/start.sh"] 
