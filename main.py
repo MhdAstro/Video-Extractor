@@ -10,10 +10,24 @@ import io
 import logging
 import time
 from fastapi.responses import JSONResponse
+import asyncio
+from starlette.requests import Request
+from starlette.responses import Response
+from fastapi.middleware.base import BaseHTTPMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+class TimeoutMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next) -> Response:
+        try:
+            return await asyncio.wait_for(call_next(request), timeout=300.0)
+        except asyncio.TimeoutError:
+            return JSONResponse(
+                status_code=504,
+                content={"detail": "Request timeout"}
+            )
 
 app = FastAPI(
     title="Video Frame Extractor API",
@@ -21,7 +35,16 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Add CORS middleware
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Application starting up...")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    logger.info("Application shutting down...")
+
+# Add middlewares
+app.add_middleware(TimeoutMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins
