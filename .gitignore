@@ -4,10 +4,28 @@ __pycache__/
 *$py.class
 *.so
 .Python
+venv/
+ENV/
 env/
-build/
-develop-eggs/
+.env
+
+# Distribution / packaging
 dist/
+build/
+*.egg-info/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Virtual Environment
+develop-eggs/
 downloads/
 eggs/
 .eggs/
@@ -17,25 +35,5 @@ parts/
 sdist/
 var/
 wheels/
-*.egg-info/
 .installed.cfg
-*.egg
-
-# Virtual Environment
-venv/
-ENV/
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Temp files
-*.tmp
-temp/
-tmp/
-
-# Logs
-*.log
-logs/ 
+*.egg 
